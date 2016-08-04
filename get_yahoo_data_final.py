@@ -63,11 +63,15 @@ def process_date(date):#(DD/MM/YYYY)
 
 def get_parser():
 	parser = argparse.ArgumentParser()
-	parser.add_argument("-s","--source_file_location", action='store', help="file with input stock symbols separated by newline")
+	parser.add_argument("-s","--source_file_location", action='store',dest='input_file', help="file with input stock symbols separated by newline")
 	parser.add_argument('-f',"--form-input", action="store_true", dest='show_form', default=False, help="Form View")
 	parser.add_argument('-c',"--config", action="store", nargs='?',const="", dest='config_option', help="Edit/View Config")
 	parser.add_argument('--set-proxy', action="store", dest='proxy', help="Proxy address (adress:port)")
-	# parser.add_argument('-', action="store_true", dest='config_reset', default=False, help="Restore Default Configuration Settings")
+	parser.add_argument("-d","--destination_directory", action='store',dest="output_directory", help="Destination Directory")
+	parser.add_argument("-o", action='store', dest='frequency', help="w (Weekly) or d (Daily)")
+	parser.add_argument("-st", action='store', dest='start_date', help="Start Date")
+	parser.add_argument("-end", action='store', dest='end_date', help="End Date")
+	parser.add_argument("-p","--use_proxy", action='store_true', dest='use_proxy', default=False, help="Use proxy settings?")
 	return parser
 
 def get_form_data():
@@ -94,18 +98,18 @@ def get_data(input_file,use_proxy,start_date,end_date,frequency,output_directory
 	end_date=process_date(end_date);
 	start_year=start_date[2];
 	end_year=end_date[2];
-	start_month=start_month[1];
-	end_month=start_date[1];
+	start_month=start_date[1];
+	end_month=end_date[1];
 	start_day=start_date[0];
 	end_day=end_date[0];	
 
 	for symbol in symbols:
 		link="http://chart.finance.yahoo.com/table.csv?s="+symbol+"&a="+start_month+"&b="+start_day+"&c="+start_year+"&d="+end_month+"&e="+end_day+"&f="+end_year+"&g="+frequency+"&ignore=.csv";
 		try:
-			print symbol+" : Downloaded"
 			with open(output_directory+symbol+".csv",'wb') as f:
 				f.write(urllib2.urlopen(link).read())
 				f.close()
+			print symbol+" : Downloaded"
 		except urllib2.HTTPError:
 			print symbol+" : Error. Please check the dates."
 			f = open("log.txt", 'w')
@@ -129,5 +133,33 @@ if __name__ == "__main__":
 			view_proxy_settings() 
 		else:
 			view_config()
-	if(args.show_form):
-		get_form_data()
+	else:		
+		if(args.show_form):
+			get_form_data()
+		else:
+			config=read_config()
+			if(args.input_file!=None):
+				input_file=args.input_file
+			else:
+				input_file=config['input_file']
+			if(args.output_directory!=None):
+				output_directory=args.output_directory
+			else:
+				output_directory=config['output_directory']
+			if(args.start_date!=None):
+				start_date=args.start_date
+			else:
+				start_date=config['start_date']
+			if(args.end_date!=None):
+				end_date=args.end_date
+			else:
+				end_date=config['end_date']
+			if(args.use_proxy):
+				use_proxy="y"
+			else:
+				use_proxy="n"
+			if(args.frequency!=None):
+				frequency=args.frequency
+			else:
+				frequency='d'
+				get_data(input_file,use_proxy,start_date,end_date,frequency,output_directory);
