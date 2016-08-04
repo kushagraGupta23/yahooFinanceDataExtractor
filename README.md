@@ -51,25 +51,25 @@ optional arguments:
   -end END_DATE         End Date
   -p, --use_proxy       Use proxy settings?
 ```
--Set proxy
+- Set proxy
 ```sh
 python yhdd.py --config --set-proxy proxy_address:port
 ```
--View proxy
+- View proxy
 ```sh
 python yhdd.py --config showproxy
 ```
--Set other default parameters
+- Set other default parameters
 ```sh
 python yhdd.py --config edit
 ```
 
--View other default parameters
+- View other default parameters
 ```sh
 python yhdd.py --config
 ```
 
--Reset default parameters
+- Reset default parameters
 ```sh
 python yhdd.py --config reset
 ```
